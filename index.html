@@ -3,84 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hub de Sorteios Premium</title>
+    <title>Hub de Sorteios Premium - Gold & Metal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Variáveis de Design Global */
         :root {
-            --bg-dark: #090a0f;
-            --card-bg: #131520;
-            --card-hover: #1c1f30;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            /* Fundo base Apple Dark */
+            --bg-base: #000000;
+            --glass-bg: rgba(28, 28, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --text-primary: #ffffff;
+            --text-secondary: #86868b;
+            --font-family: 'Inter', -apple-system, system-ui, sans-serif;
             
-            /* Cores Temáticas */
-            --coffee-accent: #f59e0b;
-            --coffee-glow: rgba(245, 158, 11, 0.4);
-            --food-accent: #ef4444;
-            --food-glow: rgba(239, 68, 68, 0.4);
+            /* TEMA CAFE (OURO) */
+            --gold-light: #F9F1D8;
+            --gold-main: #D4AF37; /* Ouro Premium */
+            --gold-dark: #AA771C;
+            --gradient-gold-btn: linear-gradient(135deg, #F9F1D8 0%, #D4AF37 50%, #AA771C 100%);
             
-            /* Cor ativa padrão */
-            --current-accent: var(--coffee-accent);
-            --current-glow: var(--coffee-glow);
+            /* TEMA RESTAURANTE (METAL) */
+            --metal-light: #ffffff;
+            --metal-main: #a1a1a6; /* Alumínio/Aço */
+            --metal-dark: #48484A;
+            /* Degradê Metalizado com Brilho */
+            --gradient-metal-btn: linear-gradient(135deg, #ffffff 0%, #d0d0d4 40%, #a1a1a6 60%, #808080 100%);
         }
 
+        /* Reset e Base */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--font-family);
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            /* Efeito de iluminação de fundo suave */
+            background-image: radial-gradient(circle at 50% -20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%);
         }
 
-        /* Sistema de Abas (Tabs) */
-        .tabs-nav {
+        /* Navegação Estilo Apple */
+        .segmented-control {
             display: flex;
-            background-color: #000000;
-            padding: 10px 10px 0 10px;
-            gap: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            margin: 20px auto;
+            padding: 4px;
+            border-radius: 14px;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid var(--glass-border);
+            z-index: 10;
         }
 
-        .tab-btn {
+        .segment-btn {
             flex: 1;
-            background: none;
+            background: transparent;
             border: none;
-            color: var(--text-muted);
-            padding: 14px;
+            color: var(--text-secondary);
+            padding: 12px;
             font-size: 1rem;
             font-weight: 600;
+            border-radius: 10px;
             cursor: pointer;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            letter-spacing: -0.5px;
         }
 
-        .tab-btn:hover {
-            color: var(--text-main);
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        .tab-btn.active[data-tab="coffee"] {
-            color: var(--coffee-accent);
-            background-color: var(--card-bg);
-            box-shadow: inset 0 3px 0 var(--coffee-accent);
-        }
-
-        .tab-btn.active[data-tab="food"] {
-            color: var(--food-accent);
-            background-color: var(--card-bg);
-            box-shadow: inset 0 3px 0 var(--food-accent);
+        .segment-btn.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         /* Container Principal */
@@ -89,13 +91,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 0 20px 20px 20px;
             overflow: hidden;
         }
 
         .view-section {
             width: 100%;
-            max-width: 750px;
+            max-width: 700px;
             height: 100%;
             display: none;
             flex-direction: column;
@@ -103,299 +105,278 @@
 
         .view-section.active {
             display: flex;
+            animation: fadeIn 0.5s ease;
         }
 
-        /* Botão Gigante (Ocupa 40% da tela útil) */
+        /* O BOTÃO GIGANTE (40% da tela) */
         .btn-wrapper {
-            height: 40vh;
+            height: 40vh; /* 40% da altura da Viewport */
             width: 100%;
+            margin-bottom: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
         }
 
-        .huge-action-btn {
+        .action-btn {
             width: 100%;
             height: 100%;
             border: none;
-            border-radius: 24px;
-            font-size: 2.5rem;
+            border-radius: 36px;
+            font-size: 2.8rem;
             font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #000000;
+            letter-spacing: -2px;
+            color: #000;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), filter 0.2s;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255,255,255,0.4);
+            text-transform: uppercase;
         }
 
-        /* Estilos dinâmicos via ID das abas */
-        #coffee-view .huge-action-btn {
-            background: linear-gradient(135deg, var(--coffee-accent), #f97316);
-            box-shadow: 0 12px 40px var(--coffee-glow);
-        }
-        #food-view .huge-action-btn {
-            background: linear-gradient(135deg, var(--food-accent), #db2777);
-            box-shadow: 0 12px 40px var(--food-glow);
+        /* Aplicação de Temas no Botão */
+        #coffee-view .action-btn { background: var(--gradient-gold-btn); }
+        #food-view .action-btn { 
+            background: var(--gradient-metal-btn); 
+            color: #111; /* Cor escura no metal para ler melhor */
         }
 
-        .huge-action-btn:hover {
-            transform: translateY(-4px);
-            filter: brightness(1.1);
-        }
-
-        .huge-action-btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
+        .action-btn:hover { filter: brightness(1.1); transform: scale(0.99); }
+        .action-btn:active { transform: scale(0.96); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
         /* Display do Resultado */
         .result-panel {
-            height: 10vh;
+            height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
-            font-weight: 800;
-            text-align: center;
             margin-bottom: 20px;
-            min-height: 70px;
         }
 
         .result-text {
-            animation: pulse 1.5s infinite alternate;
-            background: linear-gradient(to right, #ffffff, #e5e7eb);
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            text-align: center;
+            opacity: 0.95;
+        }
+
+        /* Resultado Dourado */
+        #coffee-view .result-text {
+            background: var(--gradient-gold-btn);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .winner-anim {
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        /* Resultado Metálico */
+        #food-view .result-text {
+            background: var(--gradient-metal-btn);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Painel Inferior Gerenciador (Scrollável) */
-        .management-card {
+        /* Glass Card para a Lista */
+        .glass-card {
             flex: 1;
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid var(--glass-border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
 
-        /* Formulário de Adição */
-        .add-input-group {
+        /* Inputs */
+        .input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
-        .add-input {
+        .apple-input {
             flex: 1;
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 12px 16px;
-            color: var(--text-main);
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: var(--text-primary);
             font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .add-input:focus {
+            font-weight: 500;
             outline: none;
-            border-color: var(--current-accent);
-            box-shadow: 0 0 10px var(--current-glow);
+            transition: all 0.2s;
         }
 
-        .add-btn {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
+        .apple-input:focus {
+            border-color: rgba(255,255,255,0.4);
+            background: rgba(0,0,0,0.7);
+        }
+
+        .apple-add-btn {
+            background: rgba(255,255,255,0.12);
+            color: var(--text-primary);
             border: none;
-            padding: 0 20px;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: 16px;
+            padding: 0 24px;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: 0.2s;
+            font-size: 0.95rem;
         }
 
-        .add-btn:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
+        .apple-add-btn:hover { background: rgba(255,255,255,0.2); }
 
-        /* Grid de Itens Modificados */
-        .items-scroll-area {
+        /* Lista e Scroll */
+        .list-container {
             flex: 1;
             overflow-y: auto;
-            padding-right: 4px;
+            padding-right: 8px;
         }
+        .list-container::-webkit-scrollbar { width: 5px; }
+        .list-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
 
-        .items-scroll-area::-webkit-scrollbar {
-            width: 6px;
-        }
-        .items-scroll-area::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-
-        .grid-layout {
+        .list-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
         }
 
-        /* Custom Checkbox Pill Style */
-        .item-pill {
+        /* Estilo do Item na Lista (Pill Style) */
+        .list-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 10px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s ease;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 18px;
+            border: 1px solid transparent;
+            transition: 0.2s;
         }
 
-        .item-pill:hover {
-            background-color: var(--card-hover);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
+        .list-item:hover { background: rgba(255,255,255,0.07); }
 
-        .pill-clickable-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .item-pill input[type="checkbox"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 5px;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        /* Checkbox Ativo Dinâmico */
-        #coffee-view .item-pill input[type="checkbox"]:checked {
-            background-color: var(--coffee-accent);
-            border-color: var(--coffee-accent);
-        }
-        #food-view .item-pill input[type="checkbox"]:checked {
-            background-color: var(--food-accent);
-            border-color: var(--food-accent);
-        }
-
-        .item-pill input[type="checkbox"]:checked::after {
-            content: "✓";
-            position: absolute;
-            color: #000;
-            font-size: 12px;
-            font-weight: bold;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .item-label {
-            font-size: 0.95rem;
+        .item-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            padding-right: 12px;
+            letter-spacing: -0.3px;
         }
 
-        /* Botão de Deletar item customizado */
-        .delete-item-btn {
+        /* iOS Toggle Switch Minimal */
+        .ios-toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 26px;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+
+        .ios-toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Cores do Toggle Ativo (OURO) */
+        #coffee-view .ios-toggle.active { background: var(--gold-main); }
+        /* Cores do Toggle Ativo (METAL) */
+        #food-view .ios-toggle.active { background: var(--metal-main); }
+        
+        .ios-toggle.active::after { transform: translateX(22px); }
+
+        /* Botão de Excluir minimalista */
+        .delete-btn {
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-size: 1.3rem;
             cursor: pointer;
-            padding: 0 4px;
+            padding: 0 6px;
+            transition: 0.2s;
             line-height: 1;
-            border-radius: 4px;
-            transition: all 0.2s;
         }
-
-        .delete-item-btn:hover {
-            color: #ef4444;
-            background-color: rgba(239, 68, 68, 0.1);
-        }
+        .delete-btn:hover { color: #ff453a; }
 
         /* Animações */
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            100% { opacity: 1; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
         }
-
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        .shake-anim { animation: shake 0.3s ease; }
 
         @media (max-width: 600px) {
-            .huge-action-btn { font-size: 1.8rem; }
-            .result-panel { font-size: 2.2rem; }
-            .grid-layout { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+            .segmented-control { margin: 15px auto; }
+            .action-btn { font-size: 2.1rem; border-radius: 28px;}
+            .result-text { font-size: 2.4rem; }
+            .list-grid { grid-template-columns: 1fr; }
+            .btn-wrapper { height: 35vh; } /* Reduz um pouco no mobile para caber lista */
         }
     </style>
 </head>
 <body>
 
-    <nav class="tabs-nav">
-        <button class="tab-btn active" data-tab="coffee">☕ Rodada do Café</button>
-        <button class="tab-btn" data-tab="food">🎲 Roleta dos Restaurantes</button>
+    <nav class="segmented-control">
+        <button class="segment-btn active" data-tab="coffee">☕ Café Gold</button>
+        <button class="segment-btn" data-tab="food">🎲 Roleta Metal</button>
     </nav>
 
     <main class="main-content">
 
         <section id="coffee-view" class="view-section active">
             <div class="btn-wrapper">
-                <button class="huge-action-btn" onclick="drawWinner('coffee')">Sortear Café</button>
+                <button class="action-btn" onclick="drawWinner('coffee')">Sortear Café</button>
             </div>
             
             <div class="result-panel">
-                <div class="result-text" id="coffee-result">Quem será o premiado?</div>
+                <div class="result-text" id="coffee-result">Aguardando...</div>
             </div>
 
-            <div class="management-card">
-                <div class="add-input-group">
-                    <input type="text" id="coffee-input" class="add-input" placeholder="Adicionar novo nome...">
-                    <button class="add-btn" onclick="addItem('coffee')">Incluir</button>
+            <div class="glass-card">
+                <div class="input-group">
+                    <input type="text" id="coffee-input" class="apple-input" placeholder="Adicionar participante...">
+                    <button class="apple-add-btn" onclick="addItem('coffee')">Incluir</button>
                 </div>
-                <div class="items-scroll-area">
-                    <div class="grid-layout" id="coffee-grid"></div>
+                <div class="list-container">
+                    <div class="list-grid" id="coffee-grid"></div>
                 </div>
             </div>
         </section>
 
         <section id="food-view" class="view-section">
             <div class="btn-wrapper">
-                <button class="huge-action-btn" onclick="drawWinner('food')">Girar Roleta</button>
+                <button class="action-btn" onclick="drawWinner('food')">Girar Roleta</button>
             </div>
             
             <div class="result-panel">
-                <div class="result-text" id="food-result">Onde vamos comer hoje?</div>
+                <div class="result-text" id="food-result">Onde comer?</div>
             </div>
 
-            <div class="management-card">
-                <div class="add-input-group">
-                    <input type="text" id="food-input" class="add-input" placeholder="Adicionar novo restaurante...">
-                    <button class="add-btn" onclick="addItem('food')">Incluir</button>
+            <div class="glass-card">
+                <div class="input-group">
+                    <input type="text" id="food-input" class="apple-input" placeholder="Adicionar restaurante...">
+                    <button class="apple-add-btn" onclick="addItem('food')">Incluir</button>
                 </div>
-                <div class="items-scroll-area">
-                    <div class="grid-layout" id="food-grid"></div>
+                <div class="list-container">
+                    <div class="list-grid" id="food-grid"></div>
                 </div>
             </div>
         </section>
@@ -403,165 +384,148 @@
     </main>
 
     <script>
-        // Listas Iniciais Base (Default)
+        // Listas Iniciais Base
         const defaultCoffee = ["Juan", "Anthony", "Deivid", "Felipe", "Josi", "Matheus", "Arthur", "Mari", "Karina", "lari", "Giulia", "Enzo batata otake", "Matt"];
         const defaultFood = ["Mosca", "Dudas", "Dudas Berrini", "Japa", "Savanna", "Guara", "Amora", "Espetinho", "Baoba I", "Baoba II", "Hotel", "Baraka", "Arabe Barato"];
 
-        // Estados do App (carregados da rede local do navegador)
+        // Estados Locais Persistentes
         let appState = {
-            coffee: JSON.parse(localStorage.getItem('premium_coffee_state')) || initializeState(defaultCoffee),
-            food: JSON.parse(localStorage.getItem('premium_food_state')) || initializeState(defaultFood)
+            coffee: JSON.parse(localStorage.getItem('ultimate_coffee_v2')) || initArray(defaultCoffee),
+            food: JSON.parse(localStorage.getItem('ultimate_food_v2')) || initArray(defaultFood)
         };
 
         let isRolling = false;
 
-        function initializeState(defaultArray) {
-            let state = [];
-            defaultArray.forEach(item => {
-                state.push({ name: item, enabled: true, custom: false });
-            });
-            return state;
-        }
-
-        // Navegação de Abas
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (isRolling) return; // bloqueia troca enquanto sorteia
-                
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-                
-                btn.classList.add('active');
-                const targetView = document.getElementById(`${btn.dataset.tab}-view`);
-                targetView.classList.add('active');
-                
-                // Altera variáveis de foco estético
-                if(btn.dataset.tab === 'coffee') {
-                    document.documentElement.style.setProperty('--current-accent', 'var(--coffee-accent)');
-                    document.documentElement.style.setProperty('--current-glow', 'var(--coffee-glow)');
-                } else {
-                    document.documentElement.style.setProperty('--current-accent', 'var(--food-accent)');
-                    document.documentElement.style.setProperty('--current-glow', 'var(--food-glow)');
-                }
-            });
-        });
-
-        // Adicionar novo item (Nome ou Restaurante)
-        function addItem(type) {
-            const input = document.getElementById(`${type}-input`);
-            const val = input.value.trim();
-            if (!val) return;
-
-            // Evitar duplicados
-            if (appState[type].some(item => item.name.toLowerCase() === val.toLowerCase())) {
-                input.value = '';
-                return;
-            }
-
-            appState[type].push({ name: val, enabled: true, custom: true });
-            saveState(type);
-            renderGrid(type);
-            input.value = '';
-        }
-
-        // Deletar item customizado
-        function deleteItem(type, index) {
-            appState[type].splice(index, 1);
-            saveState(type);
-            renderGrid(type);
-        }
-
-        // Inverter estado de seleção (Ativo / Inativo)
-        function toggleItem(type, index) {
-            appState[type][index].enabled = !appState[type][index].enabled;
-            saveState(type);
+        function initArray(arr) {
+            return arr.map(name => ({ name, enabled: true, custom: false }));
         }
 
         function saveState(type) {
-            localStorage.setItem(`premium_${type}_state`, JSON.stringify(appState[type]));
+            localStorage.setItem(`ultimate_${type}_v2`, JSON.stringify(appState[type]));
         }
 
-        // Renderizar elementos na tela
+        // Controle de Navegação de Abas
+        document.querySelectorAll('.segment-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isRolling) return; // Impede troca durante o sorteio
+                document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(`${btn.dataset.tab}-view`).classList.add('active');
+            });
+        });
+
+        // Renderização Dinâmica da Lista
         function renderGrid(type) {
             const grid = document.getElementById(`${type}-grid`);
             grid.innerHTML = '';
 
             appState[type].forEach((item, index) => {
-                const pill = document.createElement('div');
-                pill.className = 'item-pill';
+                const div = document.createElement('div');
+                div.className = 'list-item';
 
-                const clickArea = document.createElement('div');
-                clickArea.className = 'pill-clickable-area';
-                clickArea.onclick = (e) => {
-                    const checkbox = pill.querySelector('input');
-                    checkbox.checked = !checkbox.checked;
-                    toggleItem(type, index);
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'item-name';
+                nameSpan.textContent = item.name;
+
+                const controls = document.createElement('div');
+                controls.style.display = 'flex';
+                controls.style.alignItems = 'center';
+                controls.style.gap = '12px';
+
+                // iOS Toggle Switch
+                const toggle = document.createElement('div');
+                toggle.className = `ios-toggle ${item.enabled ? 'active' : ''}`;
+                toggle.onclick = () => {
+                    item.enabled = !item.enabled;
+                    toggle.classList.toggle('active');
+                    saveState(type);
                 };
 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = item.enabled;
+                controls.appendChild(toggle);
 
-                const label = document.createElement('span');
-                label.className = 'item-label';
-                label.textContent = item.name;
-
-                clickArea.appendChild(checkbox);
-                clickArea.appendChild(label);
-                pill.appendChild(clickArea);
-
-                // Se for um item adicionado pelo usuário, permite deletar da lista permanente
+                // Botão de deletar para itens custmizados
                 if (item.custom) {
                     const delBtn = document.createElement('button');
-                    delBtn.className = 'delete-item-btn';
-                    delBtn.innerHTML = '×';
-                    delBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        deleteItem(type, index);
+                    delBtn.className = 'delete-btn';
+                    delBtn.innerHTML = '✕';
+                    delBtn.onclick = () => {
+                        appState[type].splice(index, 1);
+                        saveState(type);
+                        renderGrid(type);
                     };
-                    pill.appendChild(delBtn);
+                    controls.appendChild(delBtn);
                 }
 
-                grid.appendChild(pill);
+                div.appendChild(nameSpan);
+                div.appendChild(controls);
+                grid.appendChild(div);
             });
         }
 
-        // Lógica Avançada de Sorteio (Efeito Roleta)
+        // Adicionar Novo Item
+        function addItem(type) {
+            const input = document.getElementById(`${type}-input`);
+            const val = input.value.trim();
+            if (!val) return;
+
+            // Evitar duplicados exatos
+            if (!appState[type].some(i => i.name.toLowerCase() === val.toLowerCase())) {
+                appState[type].unshift({ name: val, enabled: true, custom: true }); // Novo item no topo
+                saveState(type);
+                renderGrid(type);
+            }
+            input.value = '';
+        }
+
+        // ==========================================================
+        // LÓGICA À PROVA DE FALHAS (A CORREÇÃO DO BUG)
+        // ==========================================================
         function drawWinner(type) {
             if (isRolling) return;
 
-            const pool = appState[type].filter(item => item.enabled);
+            // CRUCIAL: Criamos um instantâneo (snapshot) apenas dos nomes marcados
+            // no exato milissegundo do clique. O array original não é mais consultado.
+            const snapshotPool = appState[type]
+                .filter(item => item.enabled)
+                .map(item => item.name);
+
             const display = document.getElementById(`${type}-result`);
+            const btn = document.querySelector(`#${type}-view .action-btn`);
             
-            if (pool.length === 0) {
-                display.innerHTML = `<span style="color: #ef4444; font-size: 1.5rem">Marque pelo menos uma opção abaixo!</span>`;
+            if (snapshotPool.length === 0) {
+                // Feedback de erro visual caso nada esteja marcado
+                display.textContent = "Marque alguém!";
+                display.classList.add('shake-anim');
+                btn.classList.add('shake-anim');
+                setTimeout(() => {
+                    display.classList.remove('shake-anim');
+                    btn.classList.remove('shake-anim');
+                }, 300);
                 return;
             }
 
             isRolling = true;
-            display.classList.remove('winner-anim');
-            
             let counter = 0;
-            const totalTicks = 30; // duração total do efeito de rotação
-            let speed = 40; // velocidade inicial em ms
+            let speed = 40; // Velocidade inicial (ms)
+            const maxSpins = 32; // Total de iterações da roleta
 
+            // A lógica de animação agora roda *estritamente* dentro do snapshotPool
             function spin() {
-                const randItem = pool[Math.floor(Math.random() * pool.length)];
-                display.textContent = randItem.name;
+                const randName = snapshotPool[Math.floor(Math.random() * snapshotPool.length)];
+                display.textContent = randName;
                 counter++;
 
-                if (counter < totalTicks) {
-                    // Desaceleração gradual perto do fim
-                    if (counter > 20) speed += 25;
-                    if (counter > 26) speed += 60;
+                if (counter < maxSpins) {
+                    // Desaceleração suave perto do fim
+                    if (counter > 22) speed += 35;
+                    if (counter > 28) speed += 80;
                     setTimeout(spin, speed);
                 } else {
-                    // Parada final definitiva
-                    const winner = pool[Math.floor(Math.random() * pool.length)];
-                    const colorHex = type === 'coffee' ? 'var(--coffee-accent)' : 'var(--food-accent)';
-                    
-                    display.innerHTML = `<span style="color: ${colorHex}">🎉 ${winner.name} 🎉</span>`;
-                    display.classList.add('winner-anim');
+                    // Sorteio Final Definitivo
+                    const finalWinner = snapshotPool[Math.floor(Math.random() * snapshotPool.length)];
+                    display.textContent = finalWinner;
                     isRolling = false;
                 }
             }
@@ -569,11 +533,11 @@
             spin();
         }
 
-        // Inicializar Views
+        // Inicialização do App
         renderGrid('coffee');
         renderGrid('food');
 
-        // Atalho de teclado: Enviar inputs ao apertar Enter
+        // Atalhos do teclado: Enter para adicionar
         document.getElementById('coffee-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') addItem('coffee'); });
         document.getElementById('food-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') addItem('food'); });
 
