@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio do Café ☕</title>
+    <style>
+        :root {
+            --coffee-dark: #2c1a16;
+            --coffee-medium: #4a2e25;
+            --coffee-light: #f3e8e6;
+            --accent: #ffb300;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--coffee-dark);
+            color: var(--coffee-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin: 2vh 0;
+            color: var(--accent);
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        /* Container do Botão que ocupa 40% da tela */
+        .btn-container {
+            height: 40vh; 
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #raffle-btn {
+            width: 100%;
+            height: 100%;
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background-color: var(--accent);
+            color: var(--coffee-dark);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        #raffle-btn:active {
+            transform: scale(0.97);
+        }
+
+        #raffle-btn:hover {
+            background-color: #ffc13b;
+        }
+
+        /* Resultado do sorteio */
+        #result {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            height: 12vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Container de seleção de nomes */
+        .participants-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: var(--coffee-medium);
+            padding: 20px;
+            border-radius: 15px;
+            flex-grow: 1;
+            margin-bottom: 2vh;
+            overflow-y: auto;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .participants-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1.1rem;
+            user-select: none;
+        }
+
+        .checkbox-label:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .checkbox-label input {
+            margin-right: 10px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            #raffle-btn { font-size: 2rem; }
+            #result { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>☕ Quem vai fazer o café?</h1>
+
+    <!-- Botão de 40% da tela -->
+    <div class="btn-container">
+        <button id="raffle-btn">Sortear</button>
+    </div>
+
+    <!-- Exibição do Resultado -->
+    <div id="result">...</div>
+
+    <!-- Lista de Participantes -->
+    <div class="participants-container">
+        <h2 class="participants-title">Participantes na rodada:</h2>
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <script>
+        // Lista fixa de nomes
+        const allNames = [
+            "Juan", "Anthony", "Deivid", "Felipe", "Josi", 
+            "Matheus", "Arthur", "Mari", "Karina", "lari", 
+            "Giulia", "Enzo batata otake", "Matt"
+        ];
+        
+        // Recupera do localStorage ou cria um objeto com todos marcados como 'true'
+        let selectedNames = JSON.parse(localStorage.getItem('coffeeParticipants'));
+        
+        if (!selectedNames) {
+            selectedNames = {};
+            allNames.forEach(name => selectedNames[name] = true);
+        } else {
+            // Garante que novos nomes adicionados ao código também apareçam
+            allNames.forEach(name => {
+                if (selectedNames[name] === undefined) {
+                    selectedNames[name] = true;
+                }
+            });
+        }
+
+        const grid = document.getElementById('grid');
+        const resultDisplay = document.getElementById('result');
+        const btn = document.getElementById('raffle-btn');
+        let isRaffling = false;
+
+        // Renderiza os checkboxes na tela
+        function renderCheckboxes() {
+            grid.innerHTML = '';
+            allNames.forEach(name => {
+                const label = document.createElement('label');
+                label.className = 'checkbox-label';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = selectedNames[name];
+                
+                // Evento para salvar no localStorage sempre que marcar/desmarcar
+                checkbox.onchange = (e) => {
+                    selectedNames[name] = e.target.checked;
+                    localStorage.setItem('coffeeParticipants', JSON.stringify(selectedNames));
+                };
+
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(name));
+                grid.appendChild(label);
+            });
+        }
+
+        renderCheckboxes();
+
+        // Lógica do Sorteio
+        btn.addEventListener('click', () => {
+            if (isRaffling) return;
+
+            // Filtra apenas quem está com a caixinha marcada
+            const activeParticipants = allNames.filter(name => selectedNames[name]);
+            
+            if (activeParticipants.length === 0) {
+                resultDisplay.textContent = "Selecione alguém!";
+                return;
+            }
+
+            isRaffling = true;
+            btn.textContent = "Sorteando...";
+            
+            // Efeito visual de roleta antes de parar no vencedor
+            let times = 0;
+            const maxTimes = 25; // Quantidade de vezes que o nome pisca
+            
+            const interval = setInterval(() => {
+                const randomTemp = activeParticipants[Math.floor(Math.random() * activeParticipants.length)];
+                resultDisplay.textContent = randomTemp;
+                times++;
+                
+                if (times >= maxTimes) {
+                    clearInterval(interval);
+                    // Sorteio final 100% aleatório
+                    const winner = activeParticipants[Math.floor(Math.random() * activeParticipants.length)];
+                    resultDisplay.innerHTML = `<span style="color: var(--accent)">🎉 ${winner} 🎉</span>`;
+                    btn.textContent = "Sortear novamente";
+                    isRaffling = false;
+                }
+            }, 50); // Velocidade da roleta (50ms)
+        });
+    </script>
+</body>
+</html>
