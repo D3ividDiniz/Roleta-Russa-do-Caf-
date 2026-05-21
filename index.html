@@ -3,241 +3,581 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteio do Café ☕</title>
+    <title>Hub de Sorteios Premium</title>
     <style>
         :root {
-            --coffee-dark: #2c1a16;
-            --coffee-medium: #4a2e25;
-            --coffee-light: #f3e8e6;
-            --accent: #ffb300;
+            --bg-dark: #090a0f;
+            --card-bg: #131520;
+            --card-hover: #1c1f30;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            
+            /* Cores Temáticas */
+            --coffee-accent: #f59e0b;
+            --coffee-glow: rgba(245, 158, 11, 0.4);
+            --food-accent: #ef4444;
+            --food-glow: rgba(239, 68, 68, 0.4);
+            
+            /* Cor ativa padrão */
+            --current-accent: var(--coffee-accent);
+            --current-glow: var(--coffee-glow);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--coffee-dark);
-            color: var(--coffee-light);
-            margin: 0;
-            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            height: 100vh;
             overflow: hidden;
         }
 
-        h1 {
-            margin: 2vh 0;
-            color: var(--accent);
-            text-align: center;
-            font-size: 2rem;
+        /* Sistema de Abas (Tabs) */
+        .tabs-nav {
+            display: flex;
+            background-color: #000000;
+            padding: 10px 10px 0 10px;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Container do Botão que ocupa 40% da tela */
-        .btn-container {
-            height: 40vh; 
-            width: 90%;
-            max-width: 800px;
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-btn.active[data-tab="coffee"] {
+            color: var(--coffee-accent);
+            background-color: var(--card-bg);
+            box-shadow: inset 0 3px 0 var(--coffee-accent);
+        }
+
+        .tab-btn.active[data-tab="food"] {
+            color: var(--food-accent);
+            background-color: var(--card-bg);
+            box-shadow: inset 0 3px 0 var(--food-accent);
+        }
+
+        /* Container Principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .view-section {
+            width: 100%;
+            max-width: 750px;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        /* Botão Gigante (Ocupa 40% da tela útil) */
+        .btn-wrapper {
+            height: 40vh;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 15px;
         }
 
-        #raffle-btn {
+        .huge-action-btn {
             width: 100%;
             height: 100%;
-            font-size: 3rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            background-color: var(--accent);
-            color: var(--coffee-dark);
             border: none;
-            border-radius: 20px;
+            border-radius: 24px;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #000000;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: transform 0.1s, background-color 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        #raffle-btn:active {
-            transform: scale(0.97);
+        /* Estilos dinâmicos via ID das abas */
+        #coffee-view .huge-action-btn {
+            background: linear-gradient(135deg, var(--coffee-accent), #f97316);
+            box-shadow: 0 12px 40px var(--coffee-glow);
+        }
+        #food-view .huge-action-btn {
+            background: linear-gradient(135deg, var(--food-accent), #db2777);
+            box-shadow: 0 12px 40px var(--food-glow);
         }
 
-        #raffle-btn:hover {
-            background-color: #ffc13b;
+        .huge-action-btn:hover {
+            transform: translateY(-4px);
+            filter: brightness(1.1);
         }
 
-        /* Resultado do sorteio */
-        #result {
-            font-size: 4rem;
-            font-weight: bold;
-            text-align: center;
-            height: 12vh;
+        .huge-action-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Display do Resultado */
+        .result-panel {
+            height: 10vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 70px;
         }
 
-        /* Container de seleção de nomes */
-        .participants-container {
-            width: 90%;
-            max-width: 800px;
-            background-color: var(--coffee-medium);
+        .result-text {
+            animation: pulse 1.5s infinite alternate;
+            background: linear-gradient(to right, #ffffff, #e5e7eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .winner-anim {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Painel Inferior Gerenciador (Scrollável) */
+        .management-card {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 15px;
-            flex-grow: 1;
-            margin-bottom: 2vh;
-            overflow-y: auto;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        .participants-title {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 12px;
-        }
-
-        .checkbox-label {
             display: flex;
-            align-items: center;
-            background: rgba(255,255,255,0.05);
-            padding: 12px;
-            border-radius: 8px;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Formulário de Adição */
+        .add-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-input {
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-input:focus {
+            outline: none;
+            border-color: var(--current-accent);
+            box-shadow: 0 0 10px var(--current-glow);
+        }
+
+        .add-btn {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: none;
+            padding: 0 20px;
+            border-radius: 10px;
+            font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
-            font-size: 1.1rem;
-            user-select: none;
         }
 
-        .checkbox-label:hover {
-            background: rgba(255,255,255,0.15);
+        .add-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
         }
 
-        .checkbox-label input {
-            margin-right: 10px;
-            transform: scale(1.3);
+        /* Grid de Itens Modificados */
+        .items-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .items-scroll-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .items-scroll-area::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        /* Custom Checkbox Pill Style */
+        .item-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 12px;
+            border-radius: 12px;
             cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .item-pill:hover {
+            background-color: var(--card-hover);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .pill-clickable-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .item-pill input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        /* Checkbox Ativo Dinâmico */
+        #coffee-view .item-pill input[type="checkbox"]:checked {
+            background-color: var(--coffee-accent);
+            border-color: var(--coffee-accent);
+        }
+        #food-view .item-pill input[type="checkbox"]:checked {
+            background-color: var(--food-accent);
+            border-color: var(--food-accent);
+        }
+
+        .item-pill input[type="checkbox"]:checked::after {
+            content: "✓";
+            position: absolute;
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .item-label {
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Botão de Deletar item customizado */
+        .delete-item-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .delete-item-btn:hover {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Animações */
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         @media (max-width: 600px) {
-            #raffle-btn { font-size: 2rem; }
-            #result { font-size: 2.5rem; }
+            .huge-action-btn { font-size: 1.8rem; }
+            .result-panel { font-size: 2.2rem; }
+            .grid-layout { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
         }
     </style>
 </head>
 <body>
 
-    <h1>☕ Quem vai fazer o café?</h1>
+    <nav class="tabs-nav">
+        <button class="tab-btn active" data-tab="coffee">☕ Rodada do Café</button>
+        <button class="tab-btn" data-tab="food">🎲 Roleta dos Restaurantes</button>
+    </nav>
 
-    <!-- Botão de 40% da tela -->
-    <div class="btn-container">
-        <button id="raffle-btn">Sortear</button>
-    </div>
+    <main class="main-content">
 
-    <!-- Exibição do Resultado -->
-    <div id="result">...</div>
+        <section id="coffee-view" class="view-section active">
+            <div class="btn-wrapper">
+                <button class="huge-action-btn" onclick="drawWinner('coffee')">Sortear Café</button>
+            </div>
+            
+            <div class="result-panel">
+                <div class="result-text" id="coffee-result">Quem será o premiado?</div>
+            </div>
 
-    <!-- Lista de Participantes -->
-    <div class="participants-container">
-        <h2 class="participants-title">Participantes na rodada:</h2>
-        <div class="grid" id="grid"></div>
-    </div>
+            <div class="management-card">
+                <div class="add-input-group">
+                    <input type="text" id="coffee-input" class="add-input" placeholder="Adicionar novo nome...">
+                    <button class="add-btn" onclick="addItem('coffee')">Incluir</button>
+                </div>
+                <div class="items-scroll-area">
+                    <div class="grid-layout" id="coffee-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="food-view" class="view-section">
+            <div class="btn-wrapper">
+                <button class="huge-action-btn" onclick="drawWinner('food')">Girar Roleta</button>
+            </div>
+            
+            <div class="result-panel">
+                <div class="result-text" id="food-result">Onde vamos comer hoje?</div>
+            </div>
+
+            <div class="management-card">
+                <div class="add-input-group">
+                    <input type="text" id="food-input" class="add-input" placeholder="Adicionar novo restaurante...">
+                    <button class="add-btn" onclick="addItem('food')">Incluir</button>
+                </div>
+                <div class="items-scroll-area">
+                    <div class="grid-layout" id="food-grid"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
 
     <script>
-        // Lista fixa de nomes
-        const allNames = [
-            "Juan", "Anthony", "Deivid", "Felipe", "Josi", 
-            "Matheus", "Arthur", "Mari", "Karina", "lari", 
-            "Giulia", "Enzo batata otake", "Matt"
-        ];
-        
-        // Recupera do localStorage ou cria um objeto com todos marcados como 'true'
-        let selectedNames = JSON.parse(localStorage.getItem('coffeeParticipants'));
-        
-        if (!selectedNames) {
-            selectedNames = {};
-            allNames.forEach(name => selectedNames[name] = true);
-        } else {
-            // Garante que novos nomes adicionados ao código também apareçam
-            allNames.forEach(name => {
-                if (selectedNames[name] === undefined) {
-                    selectedNames[name] = true;
+        // Listas Iniciais Base (Default)
+        const defaultCoffee = ["Juan", "Anthony", "Deivid", "Felipe", "Josi", "Matheus", "Arthur", "Mari", "Karina", "lari", "Giulia", "Enzo batata otake", "Matt"];
+        const defaultFood = ["Mosca", "Dudas", "Dudas Berrini", "Japa", "Savanna", "Guara", "Amora", "Espetinho", "Baoba I", "Baoba II", "Hotel", "Baraka", "Arabe Barato"];
+
+        // Estados do App (carregados da rede local do navegador)
+        let appState = {
+            coffee: JSON.parse(localStorage.getItem('premium_coffee_state')) || initializeState(defaultCoffee),
+            food: JSON.parse(localStorage.getItem('premium_food_state')) || initializeState(defaultFood)
+        };
+
+        let isRolling = false;
+
+        function initializeState(defaultArray) {
+            let state = [];
+            defaultArray.forEach(item => {
+                state.push({ name: item, enabled: true, custom: false });
+            });
+            return state;
+        }
+
+        // Navegação de Abas
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (isRolling) return; // bloqueia troca enquanto sorteia
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+                
+                btn.classList.add('active');
+                const targetView = document.getElementById(`${btn.dataset.tab}-view`);
+                targetView.classList.add('active');
+                
+                // Altera variáveis de foco estético
+                if(btn.dataset.tab === 'coffee') {
+                    document.documentElement.style.setProperty('--current-accent', 'var(--coffee-accent)');
+                    document.documentElement.style.setProperty('--current-glow', 'var(--coffee-glow)');
+                } else {
+                    document.documentElement.style.setProperty('--current-accent', 'var(--food-accent)');
+                    document.documentElement.style.setProperty('--current-glow', 'var(--food-glow)');
                 }
             });
-        }
+        });
 
-        const grid = document.getElementById('grid');
-        const resultDisplay = document.getElementById('result');
-        const btn = document.getElementById('raffle-btn');
-        let isRaffling = false;
+        // Adicionar novo item (Nome ou Restaurante)
+        function addItem(type) {
+            const input = document.getElementById(`${type}-input`);
+            const val = input.value.trim();
+            if (!val) return;
 
-        // Renderiza os checkboxes na tela
-        function renderCheckboxes() {
-            grid.innerHTML = '';
-            allNames.forEach(name => {
-                const label = document.createElement('label');
-                label.className = 'checkbox-label';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = selectedNames[name];
-                
-                // Evento para salvar no localStorage sempre que marcar/desmarcar
-                checkbox.onchange = (e) => {
-                    selectedNames[name] = e.target.checked;
-                    localStorage.setItem('coffeeParticipants', JSON.stringify(selectedNames));
-                };
-
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(name));
-                grid.appendChild(label);
-            });
-        }
-
-        renderCheckboxes();
-
-        // Lógica do Sorteio
-        btn.addEventListener('click', () => {
-            if (isRaffling) return;
-
-            // Filtra apenas quem está com a caixinha marcada
-            const activeParticipants = allNames.filter(name => selectedNames[name]);
-            
-            if (activeParticipants.length === 0) {
-                resultDisplay.textContent = "Selecione alguém!";
+            // Evitar duplicados
+            if (appState[type].some(item => item.name.toLowerCase() === val.toLowerCase())) {
+                input.value = '';
                 return;
             }
 
-            isRaffling = true;
-            btn.textContent = "Sorteando...";
-            
-            // Efeito visual de roleta antes de parar no vencedor
-            let times = 0;
-            const maxTimes = 25; // Quantidade de vezes que o nome pisca
-            
-            const interval = setInterval(() => {
-                const randomTemp = activeParticipants[Math.floor(Math.random() * activeParticipants.length)];
-                resultDisplay.textContent = randomTemp;
-                times++;
-                
-                if (times >= maxTimes) {
-                    clearInterval(interval);
-                    // Sorteio final 100% aleatório
-                    const winner = activeParticipants[Math.floor(Math.random() * activeParticipants.length)];
-                    resultDisplay.innerHTML = `<span style="color: var(--accent)">🎉 ${winner} 🎉</span>`;
-                    btn.textContent = "Sortear novamente";
-                    isRaffling = false;
+            appState[type].push({ name: val, enabled: true, custom: true });
+            saveState(type);
+            renderGrid(type);
+            input.value = '';
+        }
+
+        // Deletar item customizado
+        function deleteItem(type, index) {
+            appState[type].splice(index, 1);
+            saveState(type);
+            renderGrid(type);
+        }
+
+        // Inverter estado de seleção (Ativo / Inativo)
+        function toggleItem(type, index) {
+            appState[type][index].enabled = !appState[type][index].enabled;
+            saveState(type);
+        }
+
+        function saveState(type) {
+            localStorage.setItem(`premium_${type}_state`, JSON.stringify(appState[type]));
+        }
+
+        // Renderizar elementos na tela
+        function renderGrid(type) {
+            const grid = document.getElementById(`${type}-grid`);
+            grid.innerHTML = '';
+
+            appState[type].forEach((item, index) => {
+                const pill = document.createElement('div');
+                pill.className = 'item-pill';
+
+                const clickArea = document.createElement('div');
+                clickArea.className = 'pill-clickable-area';
+                clickArea.onclick = (e) => {
+                    const checkbox = pill.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+                    toggleItem(type, index);
+                };
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.enabled;
+
+                const label = document.createElement('span');
+                label.className = 'item-label';
+                label.textContent = item.name;
+
+                clickArea.appendChild(checkbox);
+                clickArea.appendChild(label);
+                pill.appendChild(clickArea);
+
+                // Se for um item adicionado pelo usuário, permite deletar da lista permanente
+                if (item.custom) {
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'delete-item-btn';
+                    delBtn.innerHTML = '×';
+                    delBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteItem(type, index);
+                    };
+                    pill.appendChild(delBtn);
                 }
-            }, 50); // Velocidade da roleta (50ms)
-        });
+
+                grid.appendChild(pill);
+            });
+        }
+
+        // Lógica Avançada de Sorteio (Efeito Roleta)
+        function drawWinner(type) {
+            if (isRolling) return;
+
+            const pool = appState[type].filter(item => item.enabled);
+            const display = document.getElementById(`${type}-result`);
+            
+            if (pool.length === 0) {
+                display.innerHTML = `<span style="color: #ef4444; font-size: 1.5rem">Marque pelo menos uma opção abaixo!</span>`;
+                return;
+            }
+
+            isRolling = true;
+            display.classList.remove('winner-anim');
+            
+            let counter = 0;
+            const totalTicks = 30; // duração total do efeito de rotação
+            let speed = 40; // velocidade inicial em ms
+
+            function spin() {
+                const randItem = pool[Math.floor(Math.random() * pool.length)];
+                display.textContent = randItem.name;
+                counter++;
+
+                if (counter < totalTicks) {
+                    // Desaceleração gradual perto do fim
+                    if (counter > 20) speed += 25;
+                    if (counter > 26) speed += 60;
+                    setTimeout(spin, speed);
+                } else {
+                    // Parada final definitiva
+                    const winner = pool[Math.floor(Math.random() * pool.length)];
+                    const colorHex = type === 'coffee' ? 'var(--coffee-accent)' : 'var(--food-accent)';
+                    
+                    display.innerHTML = `<span style="color: ${colorHex}">🎉 ${winner.name} 🎉</span>`;
+                    display.classList.add('winner-anim');
+                    isRolling = false;
+                }
+            }
+
+            spin();
+        }
+
+        // Inicializar Views
+        renderGrid('coffee');
+        renderGrid('food');
+
+        // Atalho de teclado: Enviar inputs ao apertar Enter
+        document.getElementById('coffee-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') addItem('coffee'); });
+        document.getElementById('food-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') addItem('food'); });
+
     </script>
 </body>
+</html>
 </html>
